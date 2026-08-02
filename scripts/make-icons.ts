@@ -37,6 +37,9 @@ const jobs: Array<[string, string, number]> = [
 ]
 
 for (const [name, svg, size] of jobs) {
+  // Sequential on purpose: this is a one-off build script and the log below
+  // is only readable if the files are written in the order listed.
+  // oxlint-disable-next-line no-await-in-loop
   await sharp(Buffer.from(svg)).resize(size, size).png().toFile(`${OUT}${name}`)
   console.log(`wrote public/${name}`)
 }

@@ -1,0 +1,28 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["typescript", "unicorn", "oxc", "import"],
+  "categories": {
+    "correctness": "error",
+    "suspicious": "error",
+    "perf": "error"
+  },
+  // Type-aware rules (no-floating-promises, await-thenable, ...) need the
+  // `oxlint-tsgolint` dev dependency. Setting it here rather than passing
+  // `--type-aware` keeps a bare `oxlint` honest, locally and in CI.
+  "options": {
+    "typeAware": true
+  },
+  "rules": {
+    // Vite entry points pull in CSS and fonts purely for their side effects.
+    "import/no-unassigned-import": "off",
+    // Fires on every `as`, including the DOM narrowing this app is built on
+    // (`event.target`, `data-*` attributes it wrote itself). Not in
+    // typescript-eslint's recommended set either.
+    "typescript/no-unsafe-type-assertion": "off"
+  },
+  "env": {
+    "builtin": true,
+    "browser": true
+  },
+  "ignorePatterns": ["dist"]
+}

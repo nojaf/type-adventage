@@ -15,8 +15,8 @@
   --chalk: #eef2f8;
   --accent: #4c5769;
 
-  --display: 'Bricolage Grotesque Variable', 'Archivo Variable', system-ui,
-    sans-serif;
+  --display:
+    'Bricolage Grotesque Variable', 'Archivo Variable', system-ui, sans-serif;
   --body: 'Archivo Variable', system-ui, -apple-system, sans-serif;
 
   --pad: 14px;
@@ -410,6 +410,11 @@ button {
      width, which would push the whole grid wider than a narrow viewport. */
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 6px;
+}
+
+/* With nothing picked there is no handle, so the keys take over its top gap. */
+.keys:first-child {
+  margin-top: 9px;
 }
 
 /* `display: grid` outranks the UA rule for [hidden], so restate it. */

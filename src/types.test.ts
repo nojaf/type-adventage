@@ -108,7 +108,9 @@ describe('dual types', () => {
   })
 
   test('multipliers stack down to a quarter', () => {
-    expect(multiplierAgainst('grass', ['poison', 'flying'], 'modern')).toBe(0.25)
+    expect(multiplierAgainst('grass', ['poison', 'flying'], 'modern')).toBe(
+      0.25,
+    )
   })
 
   test('an immunity on either half wins outright', () => {
@@ -121,12 +123,12 @@ describe('dual types', () => {
     const best = ALL.filter(
       (a) => multiplierAgainst(a, ['poison', 'flying'], 'modern') === 2,
     )
-    expect(best.sort()).toEqual(['electric', 'ice', 'psychic', 'rock'])
+    expect(best.toSorted()).toEqual(['electric', 'ice', 'psychic', 'rock'])
   })
 })
 
 describe('incoming damage', () => {
-  test('takes the worst of the opponent\'s two types', () => {
+  test("takes the worst of the opponent's two types", () => {
     // Poison is 2x on Grass, Flying is 2x on Grass: still 2x.
     expect(multiplierFrom(['poison', 'flying'], 'grass', 'modern')).toBe(2)
     // Poison cannot touch Steel, but Flying hits it for half.

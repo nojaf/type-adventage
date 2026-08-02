@@ -105,7 +105,11 @@ function group(
 function renderAttack(): string {
   const pool = TYPES_IN[state.gen]
   const scored = pool.map(
-    (t) => [t.id, multiplierAgainst(t.id, state.selected, state.gen)] as [TypeId, number],
+    (t) =>
+      [t.id, multiplierAgainst(t.id, state.selected, state.gen)] as [
+        TypeId,
+        number,
+      ],
   )
   // 1x is the default assumption, so listing it would only add noise.
   const grouped = group(scored, (v) => v !== 1)
@@ -119,7 +123,11 @@ function renderAttack(): string {
 function renderDefend(): string {
   const pool = TYPES_IN[state.gen]
   const scored = pool.map(
-    (t) => [t.id, multiplierFrom(state.selected, t.id, state.gen)] as [TypeId, number],
+    (t) =>
+      [t.id, multiplierFrom(state.selected, t.id, state.gen)] as [
+        TypeId,
+        number,
+      ],
   )
   const grouped = group(scored, (v) => v !== 1)
   return ladder(
@@ -171,7 +179,7 @@ function renderOpponent(): string {
     state.selected.length === 0
       ? '<span class="slot slot--ghost">Nothing picked</span>'
       : state.selected.length === 1
-        ? '<span class="slot slot--ghost">+ second type</span>'
+        ? '<button class="slot slot--ghost" data-open-keys>+ second type</button>'
         : ''
 
   const clear = state.selected.length
@@ -179,6 +187,15 @@ function renderOpponent(): string {
     : ''
 
   return `<span class="opponent__label">Opponent</span><div class="opponent__slots">${slots}${hint}</div>${clear}`
+}
+
+/**
+ * With nothing picked there is no answer to give the screen to, and picking is
+ * the only thing left to do, so the drawer stays open no matter what was
+ * toggled earlier.
+ */
+function keysOpen(): boolean {
+  return !state.selected.length || state.keysOpen
 }
 
 function renderKeyboard(): string {
@@ -192,12 +209,16 @@ function renderKeyboard(): string {
     })
     .join('')
 
-  const label = state.keysOpen ? 'Hide types' : 'Pick a type'
+  // A toggle that cannot close anything is only a dead target, so the handle
+  // appears once there is something to collapse back to.
+  const handle = state.selected.length
+    ? `<button class="handle" data-keys aria-expanded="${keysOpen()}" aria-controls="keys">
+      ${chevron()}<span>${keysOpen() ? 'Hide types' : 'Pick a type'}</span>
+    </button>`
+    : ''
   return `
-    <button class="handle" data-keys aria-expanded="${state.keysOpen}" aria-controls="keys">
-      ${chevron()}<span>${label}</span>
-    </button>
-    <div class="keys" id="keys"${state.keysOpen ? '' : ' hidden'}>${keys}</div>`
+    ${handle}
+    <div class="keys" id="keys"${keysOpen() ? '' : ' hidden'}>${keys}</div>`
 }
 
 function renderGenToggle(): string {
@@ -228,7 +249,7 @@ function render() {
     </header>
     <div class="opponent">${renderOpponent()}</div>
     <main class="results" id="results">${renderResults()}</main>
-    <footer class="keyboard${state.keysOpen ? '' : ' is-closed'}">${renderKeyboard()}</footer>`
+    <footer class="keyboard${keysOpen() ? '' : ' is-closed'}">${renderKeyboard()}</footer>`
 
   save(state)
 }
@@ -271,6 +292,12 @@ app.addEventListener('click', (event) => {
 
   if (el.closest('[data-keys]')) {
     state.keysOpen = !state.keysOpen
+    render()
+    return
+  }
+
+  if (el.closest('[data-open-keys]')) {
+    state.keysOpen = true
     render()
     return
   }

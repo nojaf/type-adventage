@@ -17,13 +17,16 @@ bun dev
 Then open the printed URL. On a phone, use `bun dev --host` and browse to your
 machine's LAN address.
 
-| Command | What it does |
-| --- | --- |
-| `bun install` | Install dependencies |
-| `bun dev` | Dev server with hot reload |
-| `bun run build` | Type-check and build to `dist/` |
-| `bun run preview` | Serve the built `dist/` locally |
-| `bun run icons` | Regenerate the app icons in `public/` |
+| Command           | What it does                          |
+| ----------------- | ------------------------------------- |
+| `bun install`     | Install dependencies                  |
+| `bun dev`         | Dev server with hot reload            |
+| `bun run build`   | Type-check and build to `dist/`       |
+| `bun run preview` | Serve the built `dist/` locally       |
+| `bun run format`  | Format everything with oxfmt          |
+| `bun run lint`    | Type-aware lint with oxlint           |
+| `bun run check`   | Format check, lint, type-check, test  |
+| `bun run icons`   | Regenerate the app icons in `public/` |
 
 The service worker is disabled in dev. To exercise the offline behaviour, run
 `bun run build && bun run preview`.
@@ -62,7 +65,7 @@ that work, and both are easy to regress:
   wider than the viewport — including `#app`'s own implicit column, which
   stretches every row.
 - `.results` sets `overflow-y: auto`, which computes `overflow-x` to `auto` as
-  well. That means horizontal overflow inside it does *not* show up in
+  well. That means horizontal overflow inside it does _not_ show up in
   `document.documentElement.scrollWidth`; measure the containers directly.
 
 Below 320px the header sheds the "Gen " prefix and the second half of the
@@ -85,6 +88,6 @@ the app always opens ready for a fresh pick.
 Multipliers multiply, so a dual type can reach 4x or ¼x. Immunity wins outright:
 Ground does nothing to Poison / Flying no matter what the other half says.
 
-On the "their attacks" side, each of your types is scored by the *worst* it can
+On the "their attacks" side, each of your types is scored by the _worst_ it can
 take from either of the opponent's types — the number you actually care about
 when deciding what to send in.
