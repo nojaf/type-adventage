@@ -1,0 +1,517 @@
+/*
+  Type Advantage
+  The chrome stays near-monochrome on purpose: the eighteen type colours are
+  loud and fixed, so anything else with saturation competes with the answer.
+  The one exception is --accent, borrowed from the opponent's own colour and
+  used only in the "who am I fighting" zone.
+*/
+
+:root {
+  --ink: #0e1116;
+  --slate: #161b23;
+  --raise: #1d232d;
+  --edge: #2a3240;
+  --mist: #8b95a5;
+  --chalk: #eef2f8;
+  --accent: #4c5769;
+
+  --display: 'Bricolage Grotesque Variable', 'Archivo Variable', system-ui,
+    sans-serif;
+  --body: 'Archivo Variable', system-ui, -apple-system, sans-serif;
+
+  --pad: 14px;
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--ink);
+  color: var(--chalk);
+  font-family: var(--body);
+  font-size: 15px;
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+:where(button):focus-visible {
+  outline: 2px solid var(--chalk);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+#app {
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  /* The implicit column would otherwise be `auto`, i.e. floored at the widest
+     row's min-content, which pushes every row past a narrow viewport. */
+  grid-template-columns: minmax(0, 1fr);
+  height: 100dvh;
+  max-width: 520px;
+  margin-inline: auto;
+  overflow: hidden;
+}
+
+/* --- top bar ---------------------------------------------------------- */
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px var(--pad);
+  border-bottom: 1px solid var(--edge);
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--accent) 16%, var(--ink)),
+    var(--ink)
+  );
+  transition: background 240ms ease;
+}
+
+.wordmark {
+  margin: 0;
+  font-family: var(--display);
+  font-size: 17px;
+  font-weight: 800;
+  font-variation-settings: 'wdth' 85;
+  letter-spacing: -0.01em;
+  line-height: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.wordmark em {
+  font-style: normal;
+  color: var(--mist);
+}
+
+.gen {
+  display: flex;
+  flex: none;
+  padding: 2px;
+  gap: 2px;
+  background: var(--slate);
+  border: 1px solid var(--edge);
+  border-radius: 999px;
+}
+
+.gen button {
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--mist);
+  white-space: nowrap;
+}
+
+.gen button[aria-pressed='true'] {
+  background: var(--chalk);
+  color: var(--ink);
+}
+
+/* --- opponent bar ----------------------------------------------------- */
+
+.opponent {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px var(--pad);
+  border-bottom: 1px solid var(--edge);
+  background: color-mix(in srgb, var(--accent) 9%, var(--ink));
+  transition: background 240ms ease;
+}
+
+.opponent__label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--mist);
+  flex: none;
+}
+
+.opponent__slots {
+  display: flex;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+  /* Scroll rather than clip: a hidden second type would be a wrong answer. */
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.opponent__slots::-webkit-scrollbar {
+  display: none;
+}
+
+.slot {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+  padding: 5px 8px;
+  border-radius: 8px;
+  background: var(--fill);
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.slot__name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.slot .glyph {
+  flex: none;
+}
+
+.slot__x {
+  opacity: 0.65;
+  margin-inline-start: -1px;
+}
+
+.slot--ghost {
+  background: none;
+  border: 1px dashed var(--edge);
+  color: var(--mist);
+  font-weight: 500;
+}
+
+.clear {
+  flex: none;
+  padding: 5px 9px;
+  border-radius: 8px;
+  border: 1px solid var(--edge);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--mist);
+}
+
+/* --- results ---------------------------------------------------------- */
+
+.results {
+  overflow-y: auto;
+  padding: 0 var(--pad) 12px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.tabs {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  padding: 10px 0 8px;
+  background: var(--ink);
+}
+
+.tabs button {
+  padding: 8px;
+  border-radius: 9px;
+  background: var(--slate);
+  border: 1px solid transparent;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--mist);
+}
+
+.tabs button[aria-selected='true'] {
+  background: var(--raise);
+  border-color: var(--edge);
+  color: var(--chalk);
+}
+
+.results__heading {
+  margin: 0 0 10px;
+  font-family: var(--body);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--mist);
+}
+
+/* The ladder: multiplier magnitude runs top to bottom. */
+
+.rung {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr);
+  gap: 12px;
+  padding: 9px 0;
+  border-top: 1px solid var(--edge);
+}
+
+.rung:first-of-type {
+  border-top: 0;
+}
+
+.rung__value {
+  font-family: var(--display);
+  font-size: 20px;
+  font-weight: 700;
+  font-variation-settings: 'wdth' 80;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  text-align: right;
+  color: var(--mist);
+  font-feature-settings: 'frac' 1;
+}
+
+.rung--high .rung__value {
+  color: var(--chalk);
+  font-size: 26px;
+  font-weight: 800;
+}
+
+.rung--zero .rung__value {
+  color: #59636f;
+}
+
+.rung__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  align-content: center;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px 4px 6px;
+  border-radius: 7px;
+  background: var(--fill);
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.rung--low .badge,
+.rung--zero .badge {
+  padding: 3px 7px 3px 5px;
+  font-size: 11px;
+  opacity: 0.72;
+}
+
+.note {
+  margin: 4px 0;
+  color: var(--mist);
+  font-size: 13px;
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100%;
+  gap: 6px;
+  text-align: center;
+  padding: 12px 8px 20px;
+}
+
+/* Auto margins rather than justify-content: centred flex content that
+   outgrows a scroll container becomes unreachable above the top edge. */
+.empty > :first-child {
+  margin-top: auto;
+}
+
+.empty > :last-child {
+  margin-bottom: auto;
+}
+
+.empty svg {
+  opacity: 0.9;
+  margin-bottom: 4px;
+}
+
+.empty h2 {
+  margin: 0;
+  font-family: var(--display);
+  font-size: 19px;
+  font-weight: 800;
+  font-variation-settings: 'wdth' 90;
+}
+
+.empty p {
+  margin: 0;
+  max-width: 30ch;
+  color: var(--mist);
+  font-size: 13px;
+}
+
+/* --- type keyboard ---------------------------------------------------- */
+
+.keyboard {
+  padding: 0 var(--pad) calc(8px + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--edge);
+  background: var(--slate);
+}
+
+.handle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  width: 100%;
+  padding: 9px 0 8px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--mist);
+}
+
+.handle .chev {
+  transition: transform 160ms ease;
+}
+
+.keyboard.is-closed .handle .chev {
+  transform: rotate(180deg);
+}
+
+.keys {
+  display: grid;
+  /* minmax(0, 1fr) rather than 1fr: the default floor is the key's min-content
+     width, which would push the whole grid wider than a narrow viewport. */
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+/* `display: grid` outranks the UA rule for [hidden], so restate it. */
+.keys[hidden] {
+  display: none;
+}
+
+.key {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 0 8px;
+  border-radius: 9px;
+  background: var(--raise);
+  border: 1px solid var(--edge);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--chalk);
+  transition:
+    background 120ms ease,
+    transform 90ms ease;
+}
+
+.key span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.key .glyph {
+  color: var(--fill);
+  flex: none;
+  font-size: 15px;
+}
+
+.key:active {
+  transform: scale(0.97);
+}
+
+.key.is-on {
+  background: var(--fill);
+  border-color: var(--fill);
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.key.is-on .glyph {
+  color: var(--ink);
+}
+
+.key[disabled] {
+  opacity: 0.34;
+  cursor: default;
+}
+
+/* --- narrow screens ---------------------------------------------------
+   Below ~320px the header and the three-column keyboard stop fitting, so
+   shed the parts that carry the least information first: the "Gen " prefix,
+   then the second half of the wordmark, then a keyboard column. */
+
+@media (max-width: 359px) {
+  .gen__pre {
+    display: none;
+  }
+}
+
+@media (max-width: 319px) {
+  :root {
+    --pad: 10px;
+  }
+
+  .wordmark em {
+    display: none;
+  }
+
+  .opponent__label {
+    font-size: 9px;
+    letter-spacing: 0.08em;
+  }
+}
+
+@media (max-width: 299px) {
+  .keys {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .opponent__label {
+    display: none;
+  }
+
+  /* Every chip carries its own remove button, so the bulk "Clear" is the
+     cheapest thing to drop to keep both type names readable in full. */
+  .clear {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
