@@ -11,7 +11,7 @@ import {
   multiplierFrom,
   multiplierLabel,
 } from './types.ts'
-import type { Generation, TypeId } from './types.ts'
+import type { Generation, TypeId, TypeInfo } from './types.ts'
 
 type Panel = 'attack' | 'defend'
 
@@ -36,7 +36,7 @@ function load(): State {
     keysOpen: true,
   }
   try {
-    const raw = localStorage.getItem(STORE_KEY)
+    const raw: string | null = localStorage.getItem(STORE_KEY)
     if (!raw) return fallback
     const saved = JSON.parse(raw) as Partial<State>
     return {
@@ -56,12 +56,12 @@ function save(state: State) {
   }
 }
 
-const state = load()
+const state: State = load()
 
 // --- rendering ---------------------------------------------------------
 
 function badge(id: TypeId): string {
-  const t = TYPE_INFO[id]
+  const t: TypeInfo = TYPE_INFO[id]
   return `<span class="badge" style="--fill:${t.color};--ink:${t.ink}">${typeIcon(id)}${t.name}</span>`
 }
 
@@ -81,8 +81,8 @@ function ladder(
   grouped: Map<number, TypeId[]>,
   emptyNote: string,
 ): string {
-  const rows = order
-    .map((v) => rung(v, grouped.get(v) ?? []))
+  const rows: string = order
+    .map((v: number) => rung(v, grouped.get(v) ?? []))
     .filter(Boolean)
     .join('')
   return rows || `<p class="note">${emptyNote}</p>`
@@ -92,10 +92,10 @@ function group(
   values: Array<[TypeId, number]>,
   keep: (v: number) => boolean,
 ): Map<number, TypeId[]> {
-  const out = new Map<number, TypeId[]>()
+  const out: Map<number, TypeId[]> = new Map()
   for (const [id, v] of values) {
     if (!keep(v)) continue
-    const bucket = out.get(v)
+    const bucket: TypeId[] | undefined = out.get(v)
     if (bucket) bucket.push(id)
     else out.set(v, [id])
   }
@@ -103,16 +103,16 @@ function group(
 }
 
 function renderAttack(): string {
-  const pool = TYPES_IN[state.gen]
-  const scored = pool.map(
-    (t) =>
+  const pool: TypeInfo[] = TYPES_IN[state.gen]
+  const scored: Array<[TypeId, number]> = pool.map(
+    (t: TypeInfo) =>
       [t.id, multiplierAgainst(t.id, state.selected, state.gen)] as [
         TypeId,
         number,
       ],
   )
   // 1x is the default assumption, so listing it would only add noise.
-  const grouped = group(scored, (v) => v !== 1)
+  const grouped: Map<number, TypeId[]> = group(scored, (v: number) => v !== 1)
   return ladder(
     [4, 2, 0.5, 0.25, 0],
     grouped,
@@ -121,15 +121,15 @@ function renderAttack(): string {
 }
 
 function renderDefend(): string {
-  const pool = TYPES_IN[state.gen]
-  const scored = pool.map(
-    (t) =>
+  const pool: TypeInfo[] = TYPES_IN[state.gen]
+  const scored: Array<[TypeId, number]> = pool.map(
+    (t: TypeInfo) =>
       [t.id, multiplierFrom(state.selected, t.id, state.gen)] as [
         TypeId,
         number,
       ],
   )
-  const grouped = group(scored, (v) => v !== 1)
+  const grouped: Map<number, TypeId[]> = group(scored, (v: number) => v !== 1)
   return ladder(
     [2, 0.5, 0],
     grouped,
@@ -147,12 +147,15 @@ function renderResults(): string {
       </div>`
   }
 
-  const names = state.selected.map((id) => TYPE_INFO[id].name).join(' / ')
+  const names: string = state.selected
+    .map((id: TypeId) => TYPE_INFO[id].name)
+    .join(' / ')
   const heading =
     state.panel === 'attack'
       ? `Your moves against ${names}`
       : `${names} moves against you`
-  const body = state.panel === 'attack' ? renderAttack() : renderDefend()
+  const body: string =
+    state.panel === 'attack' ? renderAttack() : renderDefend()
 
   return `
     <div class="tabs" role="tablist">
@@ -164,9 +167,9 @@ function renderResults(): string {
 }
 
 function renderOpponent(): string {
-  const slots = state.selected
+  const slots: string = state.selected
     .map(
-      (id) =>
+      (id: TypeId) =>
         `<button class="slot" data-drop="${id}" style="--fill:${TYPE_INFO[id].color};--ink:${TYPE_INFO[id].ink}">
            ${typeIcon(id)}<span class="slot__name">${TYPE_INFO[id].name}</span>
            <svg class="slot__x" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path fill="currentColor" d="m12 10.6 5-5 1.4 1.4-5 5 5 5-1.4 1.4-5-5-5 5L5.6 17l5-5-5-5L7 5.6z"/></svg>
@@ -199,10 +202,10 @@ function keysOpen(): boolean {
 }
 
 function renderKeyboard(): string {
-  const keys = TYPES_IN[state.gen]
-    .map((t) => {
-      const on = state.selected.includes(t.id)
-      const full = state.selected.length >= MAX_SELECTED && !on
+  const keys: string = TYPES_IN[state.gen]
+    .map((t: TypeInfo) => {
+      const on: boolean = state.selected.includes(t.id)
+      const full: boolean = state.selected.length >= MAX_SELECTED && !on
       return `<button class="key${on ? ' is-on' : ''}" data-type="${t.id}"
         style="--fill:${t.color};--ink:${t.ink}"
         aria-pressed="${on}"${full ? ' disabled' : ''}>${typeIcon(t.id)}<span>${t.name}</span></button>`
@@ -225,7 +228,7 @@ function renderGenToggle(): string {
   // "Gen " is dropped on narrow screens, so it is a separate element. The
   // accessible name keeps the full label either way.
   return (['modern', 'classic'] as Generation[])
-    .map((g) => {
+    .map((g: Generation) => {
       const [pre, rest] = GENERATION_LABEL[g].split(/(?<=Gen )/)
       return `<button data-gen="${g}" aria-pressed="${state.gen === g}"
         aria-label="${GENERATION_LABEL[g]} type chart" title="${GENERATION_NOTE[g]}"
@@ -234,10 +237,10 @@ function renderGenToggle(): string {
     .join('')
 }
 
-const app = document.querySelector<HTMLDivElement>('#app')!
+const app: HTMLDivElement = document.querySelector<HTMLDivElement>('#app')!
 
 function render() {
-  const accent = state.selected.length
+  const accent: string = state.selected.length
     ? TYPE_INFO[state.selected[0]].color
     : '#4C5769'
   app.style.setProperty('--accent', accent)
@@ -256,34 +259,40 @@ function render() {
 
 // --- interaction -------------------------------------------------------
 
-app.addEventListener('click', (event) => {
+app.addEventListener('click', (event: MouseEvent) => {
   const el = event.target as HTMLElement
-  const hit = (attr: string): string | null =>
-    (el.closest(`[${attr}]`) as HTMLElement | null)?.getAttribute(attr) ?? null
+  function hit(attr: string): string | null {
+    return (
+      (el.closest(`[${attr}]`) as HTMLElement | null)?.getAttribute(attr) ??
+      null
+    )
+  }
 
-  const type = hit('data-type')
+  const type: string | null = hit('data-type')
   if (type) {
     toggleType(type as TypeId)
     return
   }
 
-  const drop = hit('data-drop')
+  const drop: string | null = hit('data-drop')
   if (drop) {
-    state.selected = state.selected.filter((id) => id !== drop)
+    state.selected = state.selected.filter((id: TypeId) => id !== drop)
     render()
     return
   }
 
-  const gen = hit('data-gen')
+  const gen: string | null = hit('data-gen')
   if (gen) {
     state.gen = gen as Generation
-    const known = new Set(TYPES_IN[state.gen].map((t) => t.id))
-    state.selected = state.selected.filter((id) => known.has(id))
+    const known: Set<TypeId> = new Set(
+      TYPES_IN[state.gen].map((t: TypeInfo) => t.id),
+    )
+    state.selected = state.selected.filter((id: TypeId) => known.has(id))
     render()
     return
   }
 
-  const panel = hit('data-panel')
+  const panel: string | null = hit('data-panel')
   if (panel) {
     state.panel = panel as Panel
     render()
@@ -311,7 +320,7 @@ app.addEventListener('click', (event) => {
 
 function toggleType(id: TypeId) {
   if (state.selected.includes(id)) {
-    state.selected = state.selected.filter((t) => t !== id)
+    state.selected = state.selected.filter((t: TypeId) => t !== id)
   } else if (state.selected.length < MAX_SELECTED) {
     state.selected = [...state.selected, id]
   }

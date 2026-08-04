@@ -5,16 +5,16 @@ import {
   multiplierAgainst,
   multiplierFrom,
 } from './types.ts'
-import type { TypeId } from './types.ts'
+import type { TypeId, TypeInfo } from './types.ts'
 
-const ALL = TYPES.map((t) => t.id)
+const ALL: TypeId[] = TYPES.map((t: TypeInfo) => t.id)
 
 describe('chart structure', () => {
   test('covers all 18 types in both directions', () => {
     expect(ALL).toHaveLength(18)
     for (const a of ALL) {
       for (const d of ALL) {
-        const v = effectiveness(a, d, 'modern')
+        const v: number = effectiveness(a, d, 'modern')
         expect([0, 0.5, 1, 2]).toContain(v)
       }
     }
@@ -22,7 +22,9 @@ describe('chart structure', () => {
 
   test('each type has at least one weakness in the modern chart', () => {
     for (const d of ALL) {
-      const attackers = ALL.filter((a) => effectiveness(a, d, 'modern') === 2)
+      const attackers: TypeId[] = ALL.filter(
+        (a: TypeId) => effectiveness(a, d, 'modern') === 2,
+      )
       expect(attackers.length).toBeGreaterThan(0)
     }
   })
@@ -120,8 +122,8 @@ describe('dual types', () => {
   })
 
   test('Poison / Flying is countered by Electric, Ice, Psychic and Rock', () => {
-    const best = ALL.filter(
-      (a) => multiplierAgainst(a, ['poison', 'flying'], 'modern') === 2,
+    const best: TypeId[] = ALL.filter(
+      (a: TypeId) => multiplierAgainst(a, ['poison', 'flying'], 'modern') === 2,
     )
     expect(best.toSorted()).toEqual(['electric', 'ice', 'psychic', 'rock'])
   })

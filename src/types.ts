@@ -60,7 +60,7 @@ export const TYPES: TypeInfo[] = [
 ]
 
 export const TYPE_INFO: Record<TypeId, TypeInfo> = Object.fromEntries(
-  TYPES.map((t) => [t.id, t]),
+  TYPES.map((t: TypeInfo) => [t.id, t]),
 ) as Record<TypeId, TypeInfo>
 
 interface Matchups {
@@ -141,7 +141,7 @@ const MODERN: Record<TypeId, Matchups> = {
 /** Types that exist in each chart. Fairy arrived in Gen 6. */
 export const TYPES_IN: Record<Generation, TypeInfo[]> = {
   modern: TYPES,
-  classic: TYPES.filter((t) => t.id !== 'fairy'),
+  classic: TYPES.filter((t: TypeInfo) => t.id !== 'fairy'),
 }
 
 export const GENERATION_LABEL: Record<Generation, string> = {
@@ -167,7 +167,7 @@ export function effectiveness(
   if (gen === 'classic' && defender === 'steel') {
     if (attacker === 'ghost' || attacker === 'dark') return 0.5
   }
-  const m = MODERN[attacker]
+  const m: Matchups = MODERN[attacker]
   if (m.immune?.includes(defender)) return 0
   if (m.strong?.includes(defender)) return 2
   if (m.weak?.includes(defender)) return 0.5
@@ -181,7 +181,7 @@ export function multiplierAgainst(
   gen: Generation,
 ): number {
   return defenders.reduce(
-    (total, d) => total * effectiveness(attacker, d, gen),
+    (total: number, d: TypeId) => total * effectiveness(attacker, d, gen),
     1,
   )
 }
@@ -193,12 +193,13 @@ export function multiplierFrom(
   gen: Generation,
 ): number {
   return attackers.reduce(
-    (best, a) => Math.max(best, effectiveness(a, defender, gen)),
+    (best: number, a: TypeId) =>
+      Math.max(best, effectiveness(a, defender, gen)),
     0,
   )
 }
 
-const LABELS = new Map<number, string>([
+const LABELS: Map<number, string> = new Map([
   [4, '4×'],
   [2, '2×'],
   [1, '1×'],

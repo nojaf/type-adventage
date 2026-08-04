@@ -5,7 +5,7 @@ import { VitePWA } from 'vite-plugin-pwa'
  * GitHub Pages serves project sites from /<repo>/, so the build needs a base
  * path. CI passes it in; local dev and user/org sites fall back to root.
  */
-const base = process.env.BASE_PATH ?? '/'
+const base: string = process.env.BASE_PATH ?? '/'
 
 export default defineConfig({
   base,

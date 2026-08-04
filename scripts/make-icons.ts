@@ -24,7 +24,7 @@ const maskable = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" 
   <rect width="512" height="512" fill="${BG}"/>${MARK}
 </svg>`
 
-const OUT = new URL('../public/', import.meta.url).pathname
+const OUT: string = new URL('../public/', import.meta.url).pathname
 
 await mkdir(OUT, { recursive: true })
 await writeFile(`${OUT}icon.svg`, rounded)
