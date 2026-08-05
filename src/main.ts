@@ -202,7 +202,10 @@ function keysOpen(): boolean {
 }
 
 function renderKeyboard(): string {
+  // Alphabetical, not the in-game order: you arrive knowing the name you want,
+  // and scanning for it is faster than recalling where it sits in the chart.
   const keys: string = TYPES_IN[state.gen]
+    .toSorted((a: TypeInfo, b: TypeInfo) => a.name.localeCompare(b.name))
     .map((t: TypeInfo) => {
       const on: boolean = state.selected.includes(t.id)
       const full: boolean = state.selected.length >= MAX_SELECTED && !on
