@@ -1,4 +1,4 @@
-import type { TypeId } from './types.ts'
+import type { TypeId } from "./types.ts";
 
 /**
  * One glyph per type, drawn on a 24x24 grid and filled with `currentColor`.
@@ -63,11 +63,11 @@ const GLYPHS: Record<TypeId, string> = {
 
   fairy:
     '<path d="M12 1.8c.9 4.7 3.5 7.4 8.2 8.2-4.7.9-7.3 3.5-8.2 8.2-.9-4.7-3.5-7.3-8.2-8.2 4.7-.8 7.3-3.5 8.2-8.2Z"/><path d="M18.4 15.6c.4 2 1.5 3.1 3.4 3.5-2 .4-3 1.5-3.4 3.5-.4-2-1.5-3.1-3.4-3.5 2-.4 3-1.5 3.4-3.5Z"/><path d="M5.6 14.4c.3 1.5 1.1 2.3 2.5 2.6-1.4.3-2.2 1.1-2.5 2.6-.3-1.5-1.1-2.3-2.5-2.6 1.4-.3 2.2-1.1 2.5-2.6Z"/>',
-}
+};
 
 /** Inline SVG for a type glyph, sized in `em` so it tracks the label. */
-export function typeIcon(id: TypeId, size = '1.15em'): string {
-  return `<svg class="glyph" viewBox="0 0 24 24" width="${size}" height="${size}" fill="currentColor" aria-hidden="true" focusable="false">${GLYPHS[id]}</svg>`
+export function typeIcon(id: TypeId, size = "1.15em"): string {
+  return `<svg class="glyph" viewBox="0 0 24 24" width="${size}" height="${size}" fill="currentColor" aria-hidden="true" focusable="false">${GLYPHS[id]}</svg>`;
 }
 
 /** The two climbing chevrons from the app icon, reused in the empty state. */
@@ -75,10 +75,10 @@ export function appMark(size = 56): string {
   return `<svg viewBox="0 0 512 512" width="${size}" height="${size}" aria-hidden="true" focusable="false">
     <polyline points="132,262 256,150 380,262" fill="none" stroke="#EE8130" stroke-width="52" stroke-linecap="round" stroke-linejoin="round"/>
     <polyline points="132,358 256,246 380,358" fill="none" stroke="#6390F0" stroke-width="52" stroke-linecap="round" stroke-linejoin="round"/>
-  </svg>`
+  </svg>`;
 }
 
 /** Chevron used on the keyboard drawer handle. */
 export function chevron(): string {
-  return `<svg class="chev" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 8.6 19.4 16l-1.8 1.8L12 12.2l-5.6 5.6L4.6 16z"/></svg>`
+  return `<svg class="chev" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 8.6 19.4 16l-1.8 1.8L12 12.2l-5.6 5.6L4.6 16z"/></svg>`;
 }

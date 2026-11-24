@@ -3,9 +3,9 @@
 Your opponent sends out a Poison type. You have three seconds to remember what
 beats it. This app answers that in one tap.
 
-Pick the opponent's type (or two, for dual types like Poison / Flying) and it
-shows every attacking type ranked by damage multiplier, plus what their moves do
-to you. Installable as a PWA and works offline.
+Pick a type (or two, for dual types like Poison / Flying), say whether it is
+theirs or yours, and it shows the damage multipliers both ways: when you attack
+and when they attack. Installable as a PWA and works offline.
 
 ## Running it
 
@@ -23,9 +23,10 @@ machine's LAN address.
 | `bun dev`         | Dev server with hot reload            |
 | `bun run build`   | Type-check and build to `dist/`       |
 | `bun run preview` | Serve the built `dist/` locally       |
-| `bun run format`  | Format everything with oxfmt          |
-| `bun run lint`    | Type-aware lint with oxlint           |
-| `bun run check`   | Format check, lint, type-check, test  |
+| `bun fmt`         | Format everything                     |
+| `bun lint`        | Type-aware lint with oxlint           |
+| `bun check`       | Type-check                            |
+| `bun run ci`      | Format check, lint, type-check, test  |
 | `bun run icons`   | Regenerate the app icons in `public/` |
 
 The service worker is disabled in dev. To exercise the offline behaviour, run
@@ -68,9 +69,11 @@ that work, and both are easy to regress:
   well. That means horizontal overflow inside it does _not_ show up in
   `document.documentElement.scrollWidth`; measure the containers directly.
 
-Below 320px the header sheds the "Gen " prefix and the second half of the
-wordmark; below 300px the keyboard drops to two columns and the bulk "Clear"
-button goes (each type chip still has its own remove button).
+Below 360px the header sheds the "Gen " prefix, and below 320px the second half
+of the wordmark; below 300px the keyboard drops to two columns and the bulk "Clear"
+button goes (each type chip still has its own remove button). The `Theirs` /
+`Mine` toggle stays at every width; below about 420px the chips and Clear wrap
+together onto a second line under it.
 
 ### Generations
 
@@ -80,14 +83,28 @@ in `localStorage`. The differences:
 - **Gen 6+** — Fairy exists. Steel resists neither Ghost nor Dark.
 - **Gen 2-5** — No Fairy. Steel resists Ghost and Dark.
 
-The opponent selection deliberately isn't persisted: it changes every battle, so
-the app always opens ready for a fresh pick.
+The picked types, and which side they belong to, deliberately aren't persisted:
+they change every battle, so the app always opens ready for a fresh pick.
 
 ### Dual types
 
 Multipliers multiply, so a dual type can reach 4x or ¼x. Immunity wins outright:
 Ground does nothing to Poison / Flying no matter what the other half says.
 
-On the "their attacks" side, each of your types is scored by the _worst_ it can
-take from either of the opponent's types — the number you actually care about
-when deciding what to send in.
+When the picked types are the ones attacking, each target type is scored by the
+_best_ multiplier either picked type can land, because the attacker chooses the
+move. For the opponent's types that is the worst you can take, the number you
+care about when deciding what to send in. For your own types it is the best you
+can deal.
+
+### Four views
+
+The `Theirs` / `Mine` toggle says whose the picked types are, and the
+`I attack` / `They attack` tabs say who throws the moves:
+
+| Picked | I attack                                 | They attack                              |
+| ------ | ---------------------------------------- | ---------------------------------------- |
+| Theirs | Which of your move types hit them hard   | Which of your types their moves hit hard |
+| Mine   | Which of their types your moves hit hard | Which of their move types hit you hard   |
+
+Flipping the toggle keeps the picked types, so one pick answers all four.
